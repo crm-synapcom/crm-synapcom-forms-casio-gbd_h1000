@@ -1,7 +1,12 @@
 $(document).ready(function() {
     // base configuration
-    success_message = 'Bem Vindo à Casio. Obrigado por se cadastrar.'
-    error_message = 'Você já é cadastrado. Acompanhe nossos lançamentos e ofertas por e-mail.'
+    var success_message = 'Obrigado por se cadastrar.'
+    var error_message = 'Você já é cadastrado. Acompanhe nossos lançamentos e ofertas por e-mail.'
+    var validate = {
+        'name': true,
+        'gender': true,
+        'state': true,
+    }
 
     $('#contact_name').on('focusout', function() {
         var input = $(this);
@@ -52,7 +57,7 @@ $(document).ready(function() {
         event.preventDefault();
 
         // verifying inputs
-        if($('#contact_name').hasClass('invalid')){
+        if($('#contact_name').hasClass('invalid') && validate.name){
             alert('Por favor, insira seu nome.')
             return
         }
@@ -60,11 +65,11 @@ $(document).ready(function() {
             alert('Por favor, insira um email válido.')
             return
         }
-        if($('#contact_gender').hasClass('invalid')){
+        if($('#contact_gender').hasClass('invalid') && validate.gender){
             alert('Por favor, insira seu gênero.')
             return
         }
-        if($('#contact_state').hasClass('invalid')){
+        if($('#contact_state').hasClass('invalid') && validate.state){
             alert('Por favor, insira seu estado.')
             return
         }
@@ -105,21 +110,21 @@ $(document).ready(function() {
             dataType: 'json',
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(rest_data),
-            success: function(response) {
-                var resp = JSON.parse(response['body']);
-                if(resp['salesforce_status_code'] == 201) {
-                    alert(success_message);
-                } else if(resp['salesforce_status_code'] == 400) {
-                    alert(error_message);
-                }
-                $('input').each(function(response) {
+            success: function() {
+                alert(success_message);
+                $('input').each(function() {
                     if($(this).is(':text')) {
                         $(this).val('')
                     }
                 })
             },
-            error: function() {
-
+            error: function(response) {
+                var r = response.responseJSON.message;
+                if(r == 'subscriber already exists') {
+                    alert(error_message);
+                } else {
+                    
+                }
             }
         })
 
